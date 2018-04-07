@@ -1,0 +1,6 @@
+# Ignore database backup file
+DatabaseModel.mwb.bak
+
+# Ignore meta files
+.DS_STORE
+
