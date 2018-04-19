@@ -1,5 +1,6 @@
 from datetime import timedelta, date, datetime
 from math import ceil
+import holidays
 import csv
 
 START_DATE = date(2018, 1, 1)
@@ -40,12 +41,36 @@ def week_of_month(dt):
 
     return int(ceil(adjusted_dom/7.0))
 
+def get_first_day_of_month(d):
+    first_day = datetime(
+        d.year, # Copy the year
+        d.month, # Copy the month
+        1 # Set the day to the first
+    )
+    
+    return first_day.date()
+
+def get_first_day_of_year(d):
+    first_day = datetime(
+        d.year, # Copy the year
+        1, # Copy the month
+        1 # Set the day to the first
+    )
+    
+    return first_day.date()
+
+def get_last_day_of_month(d):
+    next_month = d.replace(day=28) + timedelta(days=4)  # this will never fail
+    return next_month - timedelta(days=next_month.day)
+
 def main():
     column_names = fetchColumns("DateColumns.csv")
+    us_holidays = holidays.UnitedStates()
+    uk_holidays = holidays.UnitedKingdom()
     
     with open("DateDimSampleData.csv", "w") as date_out_file:
         writer = csv.DictWriter(date_out_file, fieldnames=column_names)
-        writer.writeheader()
+        #writer.writeheader()
 
         current_year  = START_DATE.year
         current_month = START_DATE.month
@@ -90,17 +115,22 @@ def main():
 
             date_data["Year"] = single_date.strftime("%Y")
 
-            date_data["MMYYYY"] = single_date.strftime("%m%y")
+            date_data["MonthYear"] = single_date.strftime("%b-%Y")
+            date_data["MMYYYY"] = single_date.strftime("%m%Y")
 
-            # TODO FIRST DAY OF MONTH
-            # TODO LAST DAY OF MONTH
-            # TODO FIRST DAY OF YEAR
-            # TODO LAST DAY OF YEAR
-            # TODO IS HOLIDAY USA
-            # TODO HOIDAY USA
-            # TODO ISWEEKDAY
-            # TODO IS HOLIDAY UK
-            # TODO HOLIDAY UK
+            date_data["FirstDayOfMonth"] = get_first_day_of_month(single_date)
+            date_data["LastDayOfMonth"]  = get_last_day_of_month(single_date)
+
+            date_data["FirstDayOfYear"] = get_first_day_of_year(single_date)
+            date_data["LastDayOfYear"] = single_date.replace(month=12, day=31)
+            
+            date_data["IsHolidayUSA"] = 1 if single_date in us_holidays else 0
+            date_data["HolidayUSA"] = us_holidays.get(single_date,"") #.replace("'","\\'").replace(",","\\,")
+            
+            date_data["IsHolidayUK"] = 1 if single_date in uk_holidays else 0
+            date_data["HolidayUK"] = uk_holidays.get(single_date,"") #.replace("'","\\'").replace(",","\\,")
+
+            date_data["IsWeekday"] = 1 if 0 <= single_date.weekday() < 5 else 0
 
 
             writer.writerow(date_data)

@@ -3,4 +3,5 @@ DatabaseModel.mwb.bak
 
 # Ignore meta files
 .DS_STORE
+env/
 
