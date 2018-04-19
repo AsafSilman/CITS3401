@@ -3,5 +3,9 @@ DatabaseModel.mwb.bak
 
 # Ignore meta files
 .DS_STORE
+
+# Virtual environments
 env/
 
+# IDE
+.vscode/
