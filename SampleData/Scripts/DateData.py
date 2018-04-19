@@ -1,5 +1,6 @@
 from datetime import timedelta, date, datetime
 from math import ceil
+import os
 import holidays
 import csv
 
@@ -68,7 +69,7 @@ def main():
     us_holidays = holidays.UnitedStates()
     uk_holidays = holidays.UnitedKingdom()
     
-    with open("DateDimSampleData.csv", "w") as date_out_file:
+    with open(os.path.join("..", "DateDimSampleData.csv"), "w") as date_out_file: # write to parent directory
         writer = csv.DictWriter(date_out_file, fieldnames=column_names)
         #writer.writeheader()
 
