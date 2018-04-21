@@ -5,6 +5,6 @@
 5,Ryan,Howard,Bailey,Mr,1979-03-09,2001-05-02,R.Howard,Sales,Ryan.Howard@Dmifflin.com,,M,50,Employeed
 6,Darryl,Philbin,Mathias,Mr,1991-02-13,1967-04-21,D.Philbin,Logistics,Darryl.Philbin@Dmifflin.com,,M,40,Employeed
 7,Roy,Anderson,Allan,Mr,1991-04-11,1971-04-25,R.Anderson,Warehouse,Roy.Anderson@Dmifflin.com,,M,35,Terminated
-8,Charles,Miner,,Mr,1990-05-11,1973-01-20,C.Miner,Warehouse,Charles.Miner@Dmifflin.com,,M,30,Employeed
-9,Cathey,Sims,,Mrs,1990-05-11,\N,C.Cims,Warehouse,Cathey.Sims@Dmifflin.com,,F,30,Employeed
-10,Ben,Nugent,,Mr,1995-02-27,1969-02-07,B.Nugent,Warehouse,Ben.Nugent@Dmifflin.com,,M,30,Employeed
+8,Charles,Miner,NULL,Mr,1990-05-11,1973-01-20,C.Miner,Warehouse,Charles.Miner@Dmifflin.com,,M,30,Employeed
+9,Cathey,Sims,NULL,Mrs,1990-05-11,NULL,C.Cims,Warehouse,Cathey.Sims@Dmifflin.com,,F,30,Employeed
+10,Ben,Nugent,NULL,Mr,1995-02-27,1969-02-07,B.Nugent,Warehouse,Ben.Nugent@Dmifflin.com,,M,30,Employeed
