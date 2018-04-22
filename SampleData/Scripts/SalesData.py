@@ -1,8 +1,9 @@
 from datetime import datetime, date, timedelta
 import random
+import os
 import csv
 
-START_DATE = date(2012, 1, 1)
+START_DATE = date(2018, 1, 1)
 END_DATE   = date(2019, 11, 1)
 
 def daterange(start_date, end_date):
@@ -144,8 +145,8 @@ class SalesGenerator(object):
         })
 
     def adjust_stocks(self, order_date, warehouse_id, product_id, quantity, refund_date):
-        # nothing to adjust
-        if len(refund_date) == 0:
+        # nothing to adjust if there was a refund
+        if len(refund_date) != 0:
             return
         self.warehouse_stocks[warehouse_id][product_id] -= quantity
         if self.warehouse_stocks[warehouse_id][product_id] < 0:
@@ -185,7 +186,7 @@ class SalesGenerator(object):
                     "Quantity": self.warehouse_stocks[warehouse_id][product_id]
                 })
 
-    def generate_data(self, start_date, end_date, daily_iterations=25):
+    def generate_data(self, start_date, end_date, daily_iterations=5):
         for d in daterange(start_date, end_date):
             for _ in range(daily_iterations):
                 daily_random   = random.randint(0,100)
@@ -200,6 +201,23 @@ class SalesGenerator(object):
             # Calculate daily stock
             self.generate_daily_stock_levels(d)
 
+    def write_out_data(self, out_dir=".."):
+        orders_path = os.path.join(out_dir,"OrderFactSampleData.csv")
+        purchases_path = os.path.join(out_dir,"PurchasesFactSampleData.csv")
+        stock_levels_path = os.path.join(out_dir,"StockLevelsFactSampleData.csv")
+
+        self._write_data(self.orders, orders_path)
+        self._write_data(self.purchases, purchases_path)
+        self._write_data(self.stock_levels_daily, stock_levels_path)
+
+
+    def _write_data(self, data_list, out_dir):
+        with open(out_dir, "w") as f:
+            writer = csv.DictWriter(f, data_list[0].keys())
+            writer.writeheader()
+            for data in data_list:
+                writer.writerow(data)
+
 def main():
     sg = SalesGenerator()
     
@@ -213,9 +231,7 @@ def main():
 
     sg.generate_data(START_DATE, END_DATE)
 
-    for o in sg.orders: print(o)
-    for o in sg.purchases: print(o)
-    # for o in sg.stock_levels_daily: print(o)
+    sg.write_out_data()
 
 if __name__=="__main__":
     main()
