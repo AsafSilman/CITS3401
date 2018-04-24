@@ -3,8 +3,8 @@ import random
 import os
 import csv
 
-START_DATE = date(2018, 1, 1)
-END_DATE   = date(2019, 11, 1)
+START_DATE = date(2015, 1, 1)
+END_DATE   = date(2018, 11, 1)
 
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):
@@ -29,8 +29,14 @@ class SalesGenerator(object):
         "3": (51, 100)
     }
 
+    product_prices = {
+        "1": 10,
+        "2": 10,
+        "3": 10
+    }
+
     # Quantity of product in order
-    quantity_choices =[
+    quantity_choices = [
         500,
         800,
         1000,
@@ -39,9 +45,16 @@ class SalesGenerator(object):
         6000
     ]
 
+    currency_ids = [
+        1,
+        2,
+        3,
+        4
+    ]
+
     refund_rate = 5 # percentage
 
-    minimum_quantity = 7500
+    minimum_quantity = 7500 
 
     buy_back = 5000
 
@@ -113,7 +126,7 @@ class SalesGenerator(object):
             refund_date = (order_date + timedelta(days=3)).strftime("%Y%m%d")
             refund_employee = self._pick_employee()
             return (refund_date, refund_employee)
-        else: return ("","")
+        else: return ("NULL","NULL")
 
     def generate_order(self, order_d):
         order_id = self.order_id; self.order_id+= 1
@@ -121,6 +134,7 @@ class SalesGenerator(object):
         product_id  = self._pick_product()
         customer_id = random.choice(self.customer_ids)
         warehouse_id = random.choice(self.warehouse_ids)
+        currency_id = random.choice(self.currency_ids)
         quantity = random.choice(self.quantity_choices)
 
         fulfilment_date = (order_d + timedelta(days=1)).strftime("%Y%m%d")
@@ -130,6 +144,8 @@ class SalesGenerator(object):
 
         self.adjust_stocks(order_d, warehouse_id, product_id, quantity, refund_date)
         self.purchase_low_stocks(order_d, warehouse_id, product_id)
+
+        total = quantity * self.product_prices[product_id]
 
         self.orders.append({
             "OrderID": order_id,
@@ -141,7 +157,9 @@ class SalesGenerator(object):
             "RefundDate": refund_date,
             "RefundEmployee": refunt_employee,
             "WarehouseID": warehouse_id,
-            "Quantity": quantity
+            "CurrencyID": currency_id,
+            "Quantity": quantity,
+            "TotalPriceAUD": total
         })
 
     def adjust_stocks(self, order_date, warehouse_id, product_id, quantity, refund_date):
@@ -183,7 +201,7 @@ class SalesGenerator(object):
                     "DateID": day_code,
                     "WarehouseID": warehouse_id,
                     "ProductID": product_id,
-                    "Quantity": self.warehouse_stocks[warehouse_id][product_id]
+                    "StockLevel": self.warehouse_stocks[warehouse_id][product_id]
                 })
 
     def generate_data(self, start_date, end_date, daily_iterations=5):
@@ -206,14 +224,48 @@ class SalesGenerator(object):
         purchases_path = os.path.join(out_dir,"PurchasesFactSampleData.csv")
         stock_levels_path = os.path.join(out_dir,"StockLevelsFactSampleData.csv")
 
-        self._write_data(self.orders, orders_path)
-        self._write_data(self.purchases, purchases_path)
-        self._write_data(self.stock_levels_daily, stock_levels_path)
+        orders_headers = [
+            "OrderID",
+            "OrderDate",
+            "CustomerID",
+            "ProductID",
+            "FulfilmentDate",
+            "FulfilmentEmployee",
+            "RefundDate",
+            "RefundEmployee",
+            "WarehouseID",
+            "CurrencyID",
+            "Quantity",
+            "TotalPriceAUD"
+        ]
+
+        purchases_headers = [
+            "PurchaseID",
+            "PurchaseDate",
+            "Quantity",
+            "ProductID",
+            "WarehouseID"
+        ]
+
+        stock_headers = [
+            "StockLevelID",
+            "DateID",
+            "ProductID",
+            "WarehouseID",
+            "StockLevel",
+        ]
+
+        self._write_data(self.orders, orders_path, orders_headers)
+        self._write_data(self.purchases, purchases_path, purchases_headers)
+        self._write_data(self.stock_levels_daily, stock_levels_path, stock_headers)
 
 
-    def _write_data(self, data_list, out_dir):
+    def _write_data(self, data_list, out_dir, headers=None):
         with open(out_dir, "w") as f:
-            writer = csv.DictWriter(f, data_list[0].keys())
+            if headers is None:
+                writer = csv.DictWriter(f, data_list[0].keys())
+            else:
+                writer = csv.DictWriter(f, headers)
             writer.writeheader()
             for data in data_list:
                 writer.writerow(data)

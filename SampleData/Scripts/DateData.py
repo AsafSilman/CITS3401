@@ -4,8 +4,8 @@ import os
 import holidays
 import csv
 
-START_DATE = date(2018, 1, 1)
-END_DATE   = date(2019, 1, 2)
+START_DATE = date(2015, 1, 1)
+END_DATE   = date(2017, 1, 2)
 
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):
