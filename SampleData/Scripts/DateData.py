@@ -4,7 +4,7 @@ import os
 import holidays
 import csv
 
-START_DATE = date(2015, 1, 1)
+START_DATE = date(2013, 1, 1)
 END_DATE   = date(2017, 1, 2)
 
 def daterange(start_date, end_date):
