@@ -94,6 +94,10 @@ class SalesGenerator(object):
         self.warehouses = self._parse_csv_file(warehouse_path)
         self.warehouse_ids = [warehouse[0] for warehouse in self.warehouses]
 
+    def load_gepgraphy_data(self, geography_path):
+        self.geographies = self._parse_csv_file(geography_path)
+        self.geography_ids = [geography[0] for geography in self.geographies]
+
     def init_warehouse_stocks(self, level):
         self.warehouse_stocks = {
             w_id : {product: level+random.randint(-15,15) for product in self.product_ids}
@@ -135,6 +139,7 @@ class SalesGenerator(object):
         customer_id = random.choice(self.customer_ids)
         warehouse_id = random.choice(self.warehouse_ids)
         currency_id = random.choice(self.currency_ids)
+        geography_id = random.choice(self.geography_ids)
         quantity = random.choice(self.quantity_choices)
 
         fulfilment_date = (order_d + timedelta(days=1)).strftime("%Y%m%d")
@@ -158,13 +163,14 @@ class SalesGenerator(object):
             "RefundEmployee": refunt_employee,
             "WarehouseID": warehouse_id,
             "CurrencyID": currency_id,
+            "GeographyID": geography_id,
             "Quantity": quantity,
             "TotalPriceAUD": total
         })
 
     def adjust_stocks(self, order_date, warehouse_id, product_id, quantity, refund_date):
         # nothing to adjust if there was a refund
-        if len(refund_date) != 0:
+        if refund_date != "NULL":
             return
         self.warehouse_stocks[warehouse_id][product_id] -= quantity
         if self.warehouse_stocks[warehouse_id][product_id] < 0:
@@ -235,6 +241,7 @@ class SalesGenerator(object):
             "RefundEmployee",
             "WarehouseID",
             "CurrencyID",
+            "GeographyID",
             "Quantity",
             "TotalPriceAUD"
         ]
@@ -242,9 +249,9 @@ class SalesGenerator(object):
         purchases_headers = [
             "PurchaseID",
             "PurchaseDate",
-            "Quantity",
             "ProductID",
-            "WarehouseID"
+            "WarehouseID",
+            "Quantity",
         ]
 
         stock_headers = [
@@ -278,6 +285,7 @@ def main():
     sg.load_employees("../EmployeeDimSampleData.csv")
     sg.load_products("../ProductDimSampleData.csv")
     sg.load_warehouse_data("../WarehouseDimSampleData.csv")
+    sg.load_gepgraphy_data("../GeographyDimSampleData.csv")
 
     sg.init_warehouse_stocks(10000)
 
